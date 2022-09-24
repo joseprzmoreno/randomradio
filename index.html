@@ -171,6 +171,9 @@ function reproducir(url,tipo) {
 	else if (tipo == "m3u8") {
 		myPlayer.src({"src":url,"type":"application/x-mpegURL"});
 	}
+	else if (tipo == "aac") {
+		myPlayer.src({"src":url,"type":"audio/aac"});
+	}
 	else if (tipo == "yt") {
     myPlayer.src({"src":url,"type":"video/youtube"});
 	}
