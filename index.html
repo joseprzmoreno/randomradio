@@ -1,223 +1,290 @@
-
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
- <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-<style>
-* {
-	font-family: Arial Unicode MS;
-	color: white;
-	background-color:black;
-}
-#cabecera {
-	font-size: 40px;
-	text-align: center;
-	color: gold;
-}
-h1 {
-	font-size: 40px;
-	color: yellow;
-}
-#div_boton {
-	width: 100%;
-	text-align: center;
-	background-color: gold;
-}
-button {
-	background-color: darkkhaki;
-	color: white;
-	border-radius: 10px;
-	width: 200px;
-	height: 90px;
-	text-align: center;
-	cursor: pointer;
-	font-size: 30px;
-}
-#info {
-	font-size: 40px;
-	text-align: center;
-	color: #b70315;
-}
-#notas_radio {
-	font-size: 16px;
-}
-div {
-	padding-top: 20px;
-	padding-bottom: 20px;
-}
-#nombre_radio {
-	font-size: 36px;
-	text-align:center;
-	padding:10px;
-	color:white;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Random Radio</title>
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
 
-</style>
-<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
-<script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
-<script>
+    <!-- Bootstrap CSS (CDN) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+Wy6iE/RaQNE5In1N47P3d5F87G1yXiqaF5" crossorigin="anonymous">
 
-var radios = [];
-var FIN_IDIOMAS = 1000;
-var intervalo = 30000;
-var timer = undefined;
+    <!-- Google Font (CDN) - Use your preferred Google Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
 
-$(document).ready(function(){
+    <style>
+        body {
+            background-color: #343a40; /* Dark background color */
+            color: #fff; /* Light text color */
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
 
-	$('#btn_mantener').click(function(){
-		clearInterval(timer);
-	});
+        .navbar {
+            background-color: transparent; /* Transparent navbar background */
+        }
 
-	$('#btn_elegir_otra').click(function(){
-		clearInterval(timer);
-		radio_aleatoria();
-		timer = setInterval(function(){ radio_aleatoria(); }, intervalo);
-	});
+        .navbar-brand {
+            font-size: 2em; /* Big title font size */
+            color: #ffc107; /* Yellow title color */
+            background-color: transparent; /* Transparent background behind the title */
+            margin-top: 20px; /* Space above the title */
+        }
 
-	$('#btn_parar').click(function(){
-		clearInterval(timer);
-		var myPlayer = videojs("my-video");
-		myPlayer.pause();
-	});
+        a {
+            text-decoration: none; /* Remove link underline */
+            color: #fff; /* Link color */
+        }
 
-	setInterval(chequear_error,1000);
+        .radio-container {
+            text-align: center;
+            margin-top: 30px;
+        }
 
-});
+        #nombre_radio {
+            font-size: 2.5em;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
 
-function chequear_error() {
-	var myPlayer = videojs("my-video");
-	if (myPlayer.error()) {
-		$('#btn_elegir_otra').click();
-	}
-}
+        .control-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            cursor: pointer;
+        }
 
-function get_radios() {
-	var url = "https://sheets.googleapis.com/v4/spreadsheets/1Shjerqk5rVOvJwugmw9T0jJwYkoiDtMyGZfmkSxrsT4/values/A1:F" + FIN_IDIOMAS + "?key=AIzaSyAnwfVLjTYfSQVccaPZMt72x5xudsBAyjM";
-	$.ajax({
-		url:url,
-		dataType:"jsonp",
-		success:function(data) {
-			var radios_ = [];
-			//obtenemos radios
-			for (var i=0; i<data.values.length; i++) {
-				var fila = data.values[i];
-				radios_.push({"url":fila[0],"nombre":fila[1],"peso":parseInt(fila[3]),"tipo":fila[4],"activo":fila[5]});
-			}
-			radios = radios_;
-			radio_aleatoria();
-			timer = setInterval(function(){ radio_aleatoria(); }, intervalo);
-		},
-	});
-}
+        .btn {
+            font-size: 1.5em; /* Big button font size */
+            height: 60px; /* Increased button height */
+            border: none; /* No button border */
+            border-radius: 10px; /* Slightly rounded borders */
+            background-color: #ffe57f; /* Light yellow background color */
+            color: #343a40; /* Dark text color */
+            margin: 0 5px; /* Very little space between buttons */
+        }
 
-function radio_aleatoria() {
+        .form-check {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+        }
 
-	logica();
+        .form-check-input {
+            margin-right: 10px; /* Space between checkbox and text */
+        }
 
-}
+        .form-check-label {
+            font-size: 1.5em; /* Big checkbox font size */
+        }
 
-function radio_aleatoria_2() {
-	if (radios.length == 0) {
-		radios = get_radios();
-	}
-	logica();
-}
+        audio {
+            height: 60px; /* Increased audio controls height */
+        }
+        .text-center {
+            text-align: center;
+        }
+    </style>
 
-function logica() {
 
-	//elegir una radio
-	//sumar los pesos acumulados de las radios disponibles
-	var radsPosibles = [];
-	for (var i=0; i<radios.length;i++) {
-		var radio = radios[i];
-		if (radio.url != "" && radio.activo==1) {
-		//if (radio.tipo=="m3u8") {
-			radsPosibles.push(radio);
-		}
-	}
+    <!-- Bootstrap JS (CDN) -->
+    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>  
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-JziUjwVHL1uhLJVi8F8BU5SueO8SHIw7cDAwaY7sOXF0L+PfmAGYECp" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+Wy6iE/RaQNE5In1N47P3d5F87G1yXiqaF5" crossorigin="anonymous"></script>
 
-	var sumaPesosRadios = 0;
-	var radio_selecc = undefined;
-	for (var i=0; i<radsPosibles.length; i++) {
-		var radio = radsPosibles[i];
-		radio["limite_inf"] = sumaPesosRadios + 1;
-		sumaPesosRadios += radio["peso"];
-		radio["limite_sup"] = sumaPesosRadios;
-	}
-	var z = Math.floor(Math.random()*sumaPesosRadios) + 1;
-	for (var i=0; i<radsPosibles.length; i++) {
-		var radio = radsPosibles[i];
-		if (z>=radio["limite_inf"] && z<=radio["limite_sup"]) {
-			radio_selecc = radio;
-		}
-	}
-	reproducir(radio_selecc.url, radio_selecc.tipo);
-	$('#nombre_radio').html(radio_selecc.nombre);
-}
 
-function reproducir(url,tipo) {
+    <script>
 
-		var myPlayer = videojs("my-video");
-		//myPlayer.pause();
-		//console.log(url);
+        var radios = [];
+        var FIN_IDIOMAS = 1000;
+        var intervalo = 30000;
+        var timer = undefined;
+        
+        $(document).ready(function(){
+        
+            $('#btn_mantener').click(function(){
+                clearInterval(timer);
+            });
+        
+            $('#btn_elegir_otra').click(function(){
+                clearInterval(timer);
+                radio_aleatoria();
+                timer = setInterval(function(){ radio_aleatoria(); }, intervalo);
+            });
+        
+            $('#btn_parar').click(function(){
+                clearInterval(timer);
+                var myPlayer = videojs("my-video");
+                myPlayer.pause();
+            });
+        
+            setInterval(chequear_error,1000);
+        
+        });
+        
+        function chequear_error() {
+            var myPlayer = videojs("my-video");
+            if (myPlayer.error()) {
+                $('#btn_elegir_otra').click();
+            }
+        }
+        
+        function get_radios() {
+            var url = "https://sheets.googleapis.com/v4/spreadsheets/1Shjerqk5rVOvJwugmw9T0jJwYkoiDtMyGZfmkSxrsT4/values/A1:F" + FIN_IDIOMAS + "?key=AIzaSyAnwfVLjTYfSQVccaPZMt72x5xudsBAyjM";
+            $.ajax({
+                url:url,
+                dataType:"jsonp",
+                success:function(data) {
+                    var radios_ = [];
+                    //obtenemos radios
+                    for (var i=0; i<data.values.length; i++) {
+                        var fila = data.values[i];
+                        radios_.push({"url":fila[0],"nombre":fila[1],"peso":parseInt(fila[3]),"tipo":fila[4],"activo":fila[5]});
+                    }
+                    radios = radios_;
+                    radio_aleatoria();
+                    timer = setInterval(function(){ radio_aleatoria(); }, intervalo);
+                },
+            });
+        }
+        
+        function radio_aleatoria() {
+        
+            logica();
+        
+        }
+        
+        function radio_aleatoria_2() {
+            if (radios.length == 0) {
+                radios = get_radios();
+            }
+            logica();
+        }
+        
+        function logica() {
+        
+            //elegir una radio
+            //sumar los pesos acumulados de las radios disponibles
+            var radsPosibles = [];
+            for (var i=0; i<radios.length;i++) {
+                var radio = radios[i];
+                if (radio.url != "" && radio.activo==1) {
+                //if (radio.tipo=="m3u8") {
+                    radsPosibles.push(radio);
+                }
+            }
+        
+            var sumaPesosRadios = 0;
+            var radio_selecc = undefined;
+            for (var i=0; i<radsPosibles.length; i++) {
+                var radio = radsPosibles[i];
+                radio["limite_inf"] = sumaPesosRadios + 1;
+                sumaPesosRadios += radio["peso"];
+                radio["limite_sup"] = sumaPesosRadios;
+            }
+            var z = Math.floor(Math.random()*sumaPesosRadios) + 1;
+            for (var i=0; i<radsPosibles.length; i++) {
+                var radio = radsPosibles[i];
+                if (z>=radio["limite_inf"] && z<=radio["limite_sup"]) {
+                    radio_selecc = radio;
+                }
+            }
+            reproducir(radio_selecc.url, radio_selecc.tipo);
+            let showName = $('#show-name').is(":checked");
 
-	try {
-	//reproducir stream
-	if (tipo == "mp3") {
-		myPlayer.src({"src":url,"type":"audio/mpeg"});
-	}
-	else if (tipo == "nsv") {
-		myPlayer.src({"src":url,"type":"video/mp4"});
-	}
-	else if (tipo == "m3u8") {
-		myPlayer.src({"src":url,"type":"application/x-mpegURL"});
-	}
-	else if (tipo == "aac") {
-		myPlayer.src({"src":url,"type":"audio/aac"});
-	}
-	else if (tipo == "mpd") {
-		myPlayer.src({"src":url,"type":"application/dash+xml"});
-	}
-	else if (tipo == "yt") {
-    myPlayer.src({"src":url,"type":"video/youtube"});
-	}
-	myPlayer.autoplay(true);
-	myPlayer.play();
-	} catch (error) {
-		console.error("ERROR AL REPRODUCIR: " + error);
-	}
-	//console.log(myPlayer.currentSrc());
-}
-
-</script>
+            if (showName) {
+                $('#nombre_radio').html(radio_selecc.nombre);
+            } else {
+                $('#nombre_radio').html('...Every 30 Seconds');
+            }
+        }
+        
+        function reproducir(url,tipo) {
+        
+                var myPlayer = videojs("my-video");
+                //myPlayer.pause();
+                //console.log(url);
+        
+            try {
+            //reproducir stream
+            if (tipo == "mp3") {
+                myPlayer.src({"src":url,"type":"audio/mpeg"});
+            }
+            else if (tipo == "nsv") {
+                myPlayer.src({"src":url,"type":"video/mp4"});
+            }
+            else if (tipo == "m3u8") {
+                myPlayer.src({"src":url,"type":"application/x-mpegURL"});
+            }
+            else if (tipo == "aac") {
+                myPlayer.src({"src":url,"type":"audio/aac"});
+            }
+            else if (tipo == "mpd") {
+                myPlayer.src({"src":url,"type":"application/dash+xml"});
+            }
+            else if (tipo == "yt") {
+            myPlayer.src({"src":url,"type":"video/youtube"});
+            }
+            myPlayer.autoplay(true);
+            myPlayer.play();
+            } catch (error) {
+                console.error("ERROR AL REPRODUCIR: " + error);
+            }
+            //console.log(myPlayer.currentSrc());
+        }
+        
+        </script>
+</head>
 <body onload="get_radios()">
-<div id="cabecera">
-<h1>Random radio</h1>
-</div>
-<div id="cuerpo">
-<div id="info" style="text-align:center">
 
-  <video id="my-video" class="video-js" autoload controls preload="auto" width="210" height="132"
-  poster="MY_VIDEO_POSTER.jpg" data-setup="{}" style="margin:auto">
-    <!--<source id="fuente" src="" type="">-->
-    <!--<source src="http://bbcwssc.ic.llnwd.net/stream/bbcwssc_mp1_ws-araba_backup" type='audio/mpeg'>-->
-	<!--<source src="http://stream3.polskieradio.pl:8900/;" type='video/mp4'>-->
-	<!--<source src="http://albert.antfarm.co.za/rsg/rsg.stream/playlist.m3u8" type='application/x-mpegURL'>-->
-    <p class="vjs-no-js">
-      To view this video please enable JavaScript, and consider upgrading to a web browser that
-      <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
-    </p>
-  </video>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="#">A Random Radio Station</a>
+    </nav>
 
-  <script src="https://vjs.zencdn.net/7.1.0/video.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-youtube/2.6.0/Youtube.min.js"></script>
-</div>
-<hr>
-<div id="nombre_radio"></div>
-</div>
-<div id="losbotones" style="vertical-align:top;text-align:center">
-<button id="btn_mantener">Mantener</button>&nbsp;
-<button id="btn_elegir_otra">Elegir otra</button>&nbsp;
-<button id="btn_parar">Parar</button>
-</div>
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Audio Controls -->
+        <div class="radio-container">
+            <video id="my-video" class="video-js" autoload controls preload="auto" width="210" height="132"
+            poster="MY_VIDEO_POSTER.jpg" data-setup="{}" style="margin:auto">
+                <!--<source id="fuente" src="" type="">-->
+                <!--<source src="http://bbcwssc.ic.llnwd.net/stream/bbcwssc_mp1_ws-araba_backup" type='audio/mpeg'>-->
+                <!--<source src="http://stream3.polskieradio.pl:8900/;" type='video/mp4'>-->
+                <!--<source src="http://albert.antfarm.co.za/rsg/rsg.stream/playlist.m3u8" type='application/x-mpegURL'>-->
+                <p class="vjs-no-js">
+                To view this video please enable JavaScript, and consider upgrading to a web browser that
+                <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+                </p>
+            </video>
+
+            <script src="https://vjs.zencdn.net/7.1.0/video.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-youtube/2.6.0/Youtube.min.js"></script>
+            
+        </div>
+
+        <!-- Radio Station Name -->
+        <div id="nombre_radio" class="text-center">...Every 30 Seconds</div>
+
+        <!-- Buttons -->
+        <div class="control-buttons">
+            <button type="button" class="btn" id="btn_elegir_otra">Choose</button>
+            <button type="button" class="btn" id="btn_mantener">Maintain</button>
+            <button type="button" class="btn" id="btn_parar">Stop</button>
+        </div>
+
+        <!-- Checkbox -->
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="show-name" checked>
+            <label class="form-check-label" for="show-name">Show Name</label>
+        </div>
+    </div>
 </body>
 </html>
