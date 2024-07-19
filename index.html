@@ -231,7 +231,10 @@
                 myPlayer.src({"src":url,"type":"application/dash+xml"});
             }
             else if (tipo == "yt") {
-            myPlayer.src({"src":url,"type":"video/youtube"});
+                myPlayer.src({"src":url,"type":"video/youtube"});
+            }
+            else if (tipo == 'dash') {
+                myPlayer.src({"src":url,"type":"application/dash+xml"})
             }
             myPlayer.autoplay(true);
             myPlayer.play();
