@@ -236,6 +236,9 @@
             else if (tipo == 'dash') {
                 myPlayer.src({"src":url,"type":"application/dash+xml"})
             }
+            else if (tipo == 'oct') {
+                myPlayer.src({"src": url, "type": "application/octet-stream"});
+            }
             myPlayer.autoplay(true);
             myPlayer.play();
             } catch (error) {
